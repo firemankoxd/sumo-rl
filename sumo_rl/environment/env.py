@@ -20,7 +20,7 @@ from pettingzoo import AECEnv
 from pettingzoo.utils import agent_selector, wrappers
 from pettingzoo.utils.conversions import parallel_wrapper_fn
 
-from .observations import DefaultObservationFunction, ObservationFunction
+from .observations import DefaultObservationFunction, ObservationFunction, DrqNorm
 from .traffic_signal import TrafficSignal
 
 

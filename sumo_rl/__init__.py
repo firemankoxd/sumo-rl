@@ -2,6 +2,7 @@
 
 from sumo_rl.environment.env import (
     ObservationFunction,
+    DrqNorm,
     SumoEnvironment,
     TrafficSignal,
     env,
