@@ -55,6 +55,7 @@ class DrqNorm(ObservationFunction):
     def __init__(self, ts: TrafficSignal):
         """Initialize default observation function."""
         super().__init__(ts)
+        self.measures_per_lane = dict()
 
     def __call__(self) -> np.ndarray:
         """todo"""
@@ -74,7 +75,7 @@ class DrqNorm(ObservationFunction):
                 lane_obs.append(0)
             
             vehicles = []
-            lane_measures = {'queue': 0, 'approach': 0, 'total_wait': 0, 'max_wait': 0}
+            self.measures_per_lane[lane] = {'queue': 0, 'approach': 0, 'total_wait': 0, 'max_wait': 0}
             lane_vehicles = self.get_vehicles(lane, max_distance=200)
 
             for vehicle in lane_vehicles:
@@ -93,21 +94,21 @@ class DrqNorm(ObservationFunction):
                 vehicles.append(vehicle_measures)
                 
                 if vehicle_measures['wait'] > 0:
-                    lane_measures['total_wait'] = lane_measures['total_wait'] + vehicle_measures['wait']
-                    lane_measures['queue'] = lane_measures['queue'] + 1
-                    if vehicle_measures['wait'] > lane_measures['max_wait']:
-                        lane_measures['max_wait'] = vehicle_measures['wait']
+                    self.measures_per_lane[lane]['total_wait'] = self.measures_per_lane[lane]['total_wait'] + vehicle_measures['wait']
+                    self.measures_per_lane[lane]['queue'] = self.measures_per_lane[lane]['queue'] + 1
+                    if vehicle_measures['wait'] > self.measures_per_lane[lane]['max_wait']:
+                        self.measures_per_lane[lane]['max_wait'] = vehicle_measures['wait']
                 else:
-                    lane_measures['approach'] = lane_measures['approach'] + 1
+                    self.measures_per_lane[lane]['approach'] = self.measures_per_lane[lane]['approach'] + 1
 
             # Approach
-            lane_obs.append(lane_measures['approach'] / 28)
+            lane_obs.append(self.measures_per_lane[lane]['approach'] / 28)
             
             #  Total wait
-            lane_obs.append(lane_measures['total_wait'] / 28)
+            lane_obs.append(self.measures_per_lane[lane]['total_wait'] / 28)
             
             # Queue
-            lane_obs.append(lane_measures['queue'] / 28)
+            lane_obs.append(self.measures_per_lane[lane]['queue'] / 28)
 
             # Speed
             total_speed = 0

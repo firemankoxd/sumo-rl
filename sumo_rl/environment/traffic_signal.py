@@ -12,6 +12,9 @@ else:
 import numpy as np
 from gymnasium import spaces
 
+# TODO: Is this really necessary?
+import sumo_rl
+
 
 class TrafficSignal:
     """This class represents a Traffic Signal controlling an intersection.
@@ -199,6 +202,17 @@ class TrafficSignal:
         reward = self.last_measure - ts_wait
         self.last_measure = ts_wait
         return reward
+    
+    def _wait_norm_reward(self):
+        # TODO: Consider using this function without having DrqNorm observations
+        if type(self.observation_fn) is sumo_rl.DrqNorm:
+            total_wait = 0
+            for lane in self.lanes:
+                total_wait += self.observation_fn.measures_per_lane[lane]['total_wait']
+            return np.clip(-total_wait/224, -4, 4).astype(np.float32)
+        else:
+            raise NotImplementedError(f"Reward function wait-norm is only compatible with DrqNorm observations!")
+
 
     def _observation_fn_default(self):
         phase_id = [1 if self.green_phase == i else 0 for i in range(self.num_green_phases)]  # one-hot encoding
@@ -310,4 +324,5 @@ class TrafficSignal:
         "average-speed": _average_speed_reward,
         "queue": _queue_reward,
         "pressure": _pressure_reward,
+        "wait-norm": _wait_norm_reward
     }
