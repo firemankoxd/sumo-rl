@@ -128,7 +128,7 @@ class DrqNorm(ObservationFunction):
             high=1.0,
             shape=(len(self.ts.lanes)*5,)
         )
-        return spaces.Box(low=0.0, high=1.0, shape=(len(self.ts.lanes),5)) # TypeError: only size-1 arrays can be converted to Python scalars
+        # return spaces.Box(low=0.0, high=1.0, shape=(len(self.ts.lanes),5)) # TypeError: only size-1 arrays can be converted to Python scalars
     
     def get_vehicles(self, lane, max_distance):
         detectable = []
